@@ -1,5 +1,6 @@
 package von.rims.logistics.entity;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -32,6 +33,7 @@ public class RouteData {
     }
 
     // Метод для проверки наличия прямого маршрута между остановками x и y
+    @Cacheable("directRouteCache")
     public boolean hasDirectRoute(int x, int y) {
         for (Set<Integer> routeStops : routes.values()) {
             List<Integer> stopsList = new ArrayList<>(routeStops);

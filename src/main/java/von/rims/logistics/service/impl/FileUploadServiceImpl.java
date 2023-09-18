@@ -3,6 +3,7 @@ package von.rims.logistics.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class FileUploadServiceImpl implements FileUploadService {
     private final ResourceLoader resourceLoader;
     private final RouteData routeData;
 
+    private boolean fileUploaded = false;
 
     @Value("${upload.dir}")
     private String uploadDir;
@@ -73,13 +75,29 @@ public class FileUploadServiceImpl implements FileUploadService {
             System.out.println(routeData.getRoutes());
 //            loadRoutesFromFile(customFileName);
 
+            // Отмечаем флаг что файл загружен
+            fileUploaded = true;
+
+            // Отчищаем кеш
+            clearCache();
+
             // Возвращаем сообщение об успешной загрузке
             return "Файл " + fileName + " успешно загружен.";
         } catch (IOException e) {
             e.printStackTrace();
             return "Ошибка при загрузке файла.";
         }
+    }
 
+    public boolean isFileUploaded() {
+        return fileUploaded;
+    }
+
+    // Очистка кеша
+    @CacheEvict("directRouteCache")
+    public void clearCache(){
+        // Этот метод не имеет реальной логики
+        // Основное назначение - сброс кеша
     }
 
     public void loadRoutesFromFile(String fileName) {
