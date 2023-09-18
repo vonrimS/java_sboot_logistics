@@ -8,5 +8,5 @@ import lombok.Data;
 public class RouterResponse {
     private int from;
     private int to;
-    private boolean hasDirectRoute;
+    private boolean direct;
 }
