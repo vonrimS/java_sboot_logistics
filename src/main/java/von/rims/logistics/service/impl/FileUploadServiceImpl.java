@@ -1,24 +1,20 @@
 package von.rims.logistics.service.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import von.rims.logistics.entity.RouteData;
+import von.rims.logistics.entity.Stops;
 import von.rims.logistics.service.FileUploadService;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +53,6 @@ public class FileUploadServiceImpl implements FileUploadService {
             }
 
             // Получаем имя файла
-//            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
             String fileName = customFileName;
 
             // Формируем путь для сохранения файла
@@ -68,12 +63,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             Path targetLocation = Path.of(filePath).toAbsolutePath().normalize();
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
-            // Начинаем загрузку стрктуры данных из файла
-//            System.out.println("...загрузка начата");
-
+            // Загружаем структуру данных из файла по сформированному пути
             loadRoutesFromFile(filePath);
-            System.out.println(routeData.getRoutes());
-//            loadRoutesFromFile(customFileName);
 
             // Отмечаем флаг что файл загружен
             fileUploaded = true;
@@ -103,7 +94,6 @@ public class FileUploadServiceImpl implements FileUploadService {
     public void loadRoutesFromFile(String fileName) {
         try (
                 InputStream inputStream = new FileInputStream(fileName);
-//                InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader reader = new BufferedReader(inputStreamReader))
         {
@@ -112,11 +102,18 @@ public class FileUploadServiceImpl implements FileUploadService {
                 String[] parts = line.split(" ");
                 if (parts.length > 1) {
                     int routeId = Integer.parseInt(parts[0]);
-                    Set<Integer> routeStops = Arrays.stream(parts)
-                            .skip(1) // пропускаем первое число (идентификатор маршрута)
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toSet());
-                    routeData.addRoute(routeId, routeStops);
+                    Stops stops = routeData.getStopsForRoute(routeId);
+                    if (stops == null) {
+                        stops = new Stops();
+                        routeData.addRoute(routeId, stops);
+                    }
+                    int counter = 0;
+                    for (int i = 1; i < parts.length; i++) {
+                        int stopId = Integer.parseInt(parts[i]);
+                        stops.add(stopId, counter++);
+                    }
+
+                    routeData.addRoute(routeId, stops);
                 }
             }
         } catch (IOException e) {

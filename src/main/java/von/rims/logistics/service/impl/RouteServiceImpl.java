@@ -26,12 +26,11 @@ public class RouteServiceImpl implements RouteService {
     public boolean hasDirectRoute(int x, int y) {
         // Проверяем наличие файла перед вызовом
         if (!fileUploadService.isFileUploaded()) {
-            // Возвращаем false
+            // Возвращаем false усли файл не загружен
             return false;
         }
 
-        System.out.println(routeData.getRoutes());
-
+        // Файл загружен, можем проверить данные
         return routeData.hasDirectRoute(x, y);
     }
 }

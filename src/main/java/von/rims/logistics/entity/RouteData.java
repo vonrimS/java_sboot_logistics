@@ -8,46 +8,28 @@ import java.util.*;
 
 @Component
 public class RouteData {
-    private final Map<Integer, Set<Integer>> routes = new HashMap<>();
-    private final Set<Integer> stops = new LinkedHashSet<>();
+    private final Map<Integer, Stops> routes = new HashMap<>();
 
     // Метод для добавления маршрута
-    public void addRoute(int routeId, Set<Integer> routeStops) {
-        routes.put(routeId, routeStops);
-        stops.addAll(routeStops);
+    public void addRoute(int routeId, Stops stops) {
+        routes.put(routeId, stops);
     }
 
-    // Метод для добавления остановки
-    public void addStop(int stopId) {
-        stops.add(stopId);
+    // Метод для получения объекта Stops для указанного маршрута
+    public Stops getStopsForRoute(int routeId) {
+        return routes.get(routeId);
     }
 
-    // Метод для получения всех маршрутов
-    public Map<Integer, Set<Integer>> getRoutes() {
-        return Collections.unmodifiableMap(routes);
-    }
-
-    // Метод для получения всех остановок
-    public Set<Integer> getStops() {
-        return Collections.unmodifiableSet(stops);
-    }
-
-    // Метод для проверки наличия прямого маршрута между остановками x и y
+    // Метод для проверки наличия прямого маршрута между остановками 'from' и 'to' для каждого маршрута
     @Cacheable("directRouteCache")
-    public boolean hasDirectRoute(int x, int y) {
-        for (Set<Integer> routeStops : routes.values()) {
-            List<Integer> stopsList = new ArrayList<>(routeStops);
-
-            int xIndex = stopsList.indexOf(x);
-            int yIndex = stopsList.indexOf(y);
-
-            if (xIndex != -1 && yIndex != -1 && xIndex < yIndex) {
-                // Найден прямой маршрут, где x идет раньше y
+    public boolean hasDirectRoute(int from, int to) {
+        for (Map.Entry<Integer, Stops> entry : routes.entrySet()) {
+            Stops stops = entry.getValue();
+            // Если словарь остановок сформирован и остановки удовлетворяют условиям проверки
+            if (stops != null && stops.hasDirectRoute(from , to)) {
                 return true;
             }
         }
-
-        // Прямого маршрута не найдено
         return false;
     }
 }
