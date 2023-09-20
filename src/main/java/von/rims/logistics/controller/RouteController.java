@@ -19,7 +19,7 @@ public class RouteController {
             @RequestParam("to") int toStop) {
 
         boolean hasDirectRoute = routeService.hasDirectRoute(fromStop, toStop);
-        System.out.println("from: " + fromStop + " -> to: " + toStop);
+//        System.out.println("from: " + fromStop + " -> to: " + toStop);
 
         // Создаем объект RouterResponse и устанавливаем значения полей
         return new RouterResponse(fromStop, toStop, hasDirectRoute);

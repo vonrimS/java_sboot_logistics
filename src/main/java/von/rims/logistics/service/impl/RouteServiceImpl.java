@@ -30,6 +30,8 @@ public class RouteServiceImpl implements RouteService {
             return false;
         }
 
+//        routeData.printAllRoutes();
+
         // Файл загружен, можем проверить данные
         return routeData.hasDirectRoute(x, y);
     }
