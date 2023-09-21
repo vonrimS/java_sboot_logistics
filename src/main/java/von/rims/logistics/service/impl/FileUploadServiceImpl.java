@@ -38,6 +38,8 @@ public class FileUploadServiceImpl implements FileUploadService {
         }
 
         try {
+            long startTime = System.currentTimeMillis();
+
             // Получаем ресурс по относительному пути
             Resource resource = resourceLoader.getResource(uploadDir);
 
@@ -71,6 +73,10 @@ public class FileUploadServiceImpl implements FileUploadService {
 
             // Отчищаем кеш
             clearCache();
+
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            System.out.println("Execution Time for file uploading: " + executionTime + " milliseconds");
 
             // Возвращаем сообщение об успешной загрузке
             return "Файл " + fileName + " успешно загружен.";

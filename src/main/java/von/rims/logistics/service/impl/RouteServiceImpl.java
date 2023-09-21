@@ -30,9 +30,19 @@ public class RouteServiceImpl implements RouteService {
             return false;
         }
 
+
+        long startTime = System.currentTimeMillis();
+
 //        routeData.printAllRoutes();
 
         // Файл загружен, можем проверить данные
-        return routeData.hasDirectRoute(x, y);
+        boolean result = routeData.hasDirectRoute(x, y);
+
+        long endTime = System.currentTimeMillis();
+        long executionTime = endTime - startTime;
+
+        System.out.println("Execution Time: " + executionTime + " milliseconds");
+
+        return result;
     }
 }
